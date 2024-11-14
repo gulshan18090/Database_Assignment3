@@ -1,3 +1,14 @@
+drop table if exists public.authors_nf2;
+drop table if exists public.book_authors_nf2;
+drop table if exists public.book_publisher_nf3;
+drop table if exists public.books_nf2;
+drop table if exists public.books_nf3;
+drop table if exists public.course_books_nf2;
+drop table if exists public.courses_nf2;
+drop table if exists public.firstnf;
+drop table  if exists public.publisher_nf3;
+drop table if exists public.unnormalized_data;
+
 CREATE TABLE unnormalized_data (
     CRN INT,
     ISBN VARCHAR(13),
@@ -32,16 +43,17 @@ INSERT INTO FirstNF (CRN, ISBN, Title, Author, Edition, Publisher,Publisher_addr
 SELECT CRN, ISBN, Title, unnest(string_to_array(Authors, ',')), Edition, Publisher,Publisher_address, Pages, Year, Course_Name
 FROM unnormalized_data;
 
+
 --2NF
 -- BOOKS, COURSES, AUTHORS, BOOK_AUTHORS, CORUSE_BOOKS
 
 create table courses_nf2(
 	CRN INT primary key,
 	course_name varchar(255)
-)
+);
 
 insert into courses_nf2(CRN, course_name)
-select distinct CRN, course_name from unnormalized_data
+select distinct CRN, course_name from unnormalized_data;
 
 
 create table books_nf2(
@@ -52,12 +64,63 @@ create table books_nf2(
     Publisher_address text,
     Pages INT,
     Year INT
-)
+);
 
 
 INSERT INTO books_nf2 (ISBN, Title, Edition, Publisher, Publisher_address, Pages, Year)
 SELECT DISTINCT ISBN, Title, Edition, Publisher, Publisher_address, Pages, Year FROM FirstNF;
 
+
+
+CREATE TABLE authors_nf2 AS
+SELECT DISTINCT
+    Author as Author_Name
+FROM FirstNF;
+ALTER TABLE authors_nf2
+ADD AuthorID SERIAL PRIMARY KEY;
+
+
+
+CREATE TABLE book_authors_nf2 AS
+SELECT DISTINCT
+    cb.ISBN,
+	a.AuthorID
+FROM FirstNF as cb
+JOIN Authors_NF2 as a on cb.author = a.author_name;
+
+create table course_books_nf2 as
+select distinct
+    cb.ISBN,
+	a.CRN
+FROM FirstNF as cb
+JOIN courses_nf2 as a on cb.course_name = a.course_name;
+
+
+--3NF
+--PUBLISHER BOOK_PUBLISHER
+
+create table publisher_nf3 as
+select distinct
+	publisher as publisher_name,
+	publisher_address
+from books_nf2
+ALTER TABLE publisher_nf3
+ADD publisher_id SERIAL PRIMARY KEY;
+
+
+create table books_nf3 as
+select ISBN, title, edition, pages, year from books_nf2;
+
+create table book_publisher_nf3 as
+select distinct
+  b.ISBN,
+  p.publisher_id
+from books_nf2 as b
+join publisher_nf3 as p on b.publisher=p.publisher_name;
+
+
+--final tables 
+--BOOKS_NF3 PUBLISHER_NF3 AUTHORS_NF2 COURSES_NF2 BOOK_AUTHORS_NF2 BOOK_PUBLISHER_NF3 COURSE_BOOKS_NF2
 
 
 
