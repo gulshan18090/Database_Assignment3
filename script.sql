@@ -11,8 +11,8 @@ CREATE TABLE unnormalized_data (
     Course_Name VARCHAR(255)
 );
 
--- To load from a CSV file (make sure the file is accessible to PostgreSQL)
-COPY unnormalized_data FROM 'C:\Users\Gulsh\Unnormalized_data.csv' DELIMITER ',' CSV HEADER;
+-- To load from a CSV file (runs in powershell)
+\COPY unnormalized_data FROM 'C:\Users\Gulsh\Unnormalized_data.csv' DELIMITER ',' CSV HEADER;
 
 CREATE TABLE FirstNF (
     CRN INT,
