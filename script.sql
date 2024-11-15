@@ -103,7 +103,7 @@ create table publisher_nf3 as
 select distinct
 	publisher as publisher_name,
 	publisher_address
-from books_nf2
+from books_nf2;
 ALTER TABLE publisher_nf3
 ADD publisher_id SERIAL PRIMARY KEY;
 
