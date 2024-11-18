@@ -23,7 +23,7 @@ CREATE TABLE unnormalized_data (
 );
 
 -- To load from a CSV file (runs in powershell)
-\COPY unnormalized_data FROM 'C:\Users\Gulsh\Unnormalized_data.csv' DELIMITER ',' CSV HEADER;
+COPY unnormalized_data FROM 'C:\Users\Gulsh\Unnormalized_data.csv' DELIMITER ',' CSV HEADER;
 
 CREATE TABLE FirstNF (
     CRN INT,
